@@ -9,7 +9,9 @@ import urllib.parse
 from push import push
 from log_utils import setup_logging
 from config import data, headers, cookies, READ_NUM, PUSH_METHOD, book, chapter
+from cookie_store import load_cookies, save_cookies
 
+cookies = load_cookies(cookies)
 
 # 加密盐及其它默认值
 KEY = "3c5c8717f3daf09iop3423zafeqoi"
@@ -54,8 +56,18 @@ def get_wr_skey():
                 timeout=REQUEST_TIMEOUT,
             )
             
-            if 'wr_skey' in response.cookies:
-                return response.cookies['wr_skey'][:8]
+            if response.ok and 'wr_skey' in response.cookies:
+                for key, value in response.cookies.items():
+                    if value:
+                        cookies[key] = value
+                # 暂时保留项目现有的 8 位处理规则
+                new_skey = response.cookies['wr_skey'][:8]
+
+                cookies['wr_skey'] = new_skey
+
+                save_cookies(cookies)
+
+                return new_skey
             else:
                 continue
         except requests.RequestException as exc:
