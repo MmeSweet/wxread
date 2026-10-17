@@ -10,3 +10,5 @@ logs/
 .env
 .env.local
 .env.*.local
+.wxread-state/
+*.enc
