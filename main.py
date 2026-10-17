@@ -94,6 +94,7 @@ def refresh_cookie(strict=True):
     new_skey = get_wr_skey()
     if new_skey:
         cookies['wr_skey'] = new_skey
+        save_cookies(cookies)
         logging.info(f"密钥刷新成功，新密钥：{new_skey[:2]}***")
         logging.info("重新本次阅读。")
         return True
