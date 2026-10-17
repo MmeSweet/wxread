@@ -45,36 +45,37 @@ def cal_hash(input_string):
     return hex(_7032f5 + _cc1055)[2:].lower()
 
 def get_wr_skey():
-    """刷新cookie密钥"""
+    """刷新 Cookie 密钥"""
     for cookie_data in COOKIE_DATA_VARIANTS:
         try:
             response = requests.post(
                 RENEW_URL,
                 headers=headers,
                 cookies=cookies,
-                data=json.dumps(cookie_data, separators=(',', ':')),
+                data=json.dumps(
+                    cookie_data,
+                    separators=(',', ':')
+                ),
                 timeout=REQUEST_TIMEOUT,
             )
-            
+
             if response.ok and 'wr_skey' in response.cookies:
+                # 同步服务端返回的 Cookie
                 for key, value in response.cookies.items():
                     if value:
                         cookies[key] = value
-                # 暂时保留项目现有的 8 位处理规则
-                new_skey = response.cookies['wr_skey'][:8]
 
+                # 暂时沿用项目原有的 8 位 skey 规则
+                new_skey = response.cookies['wr_skey'][:8]
                 cookies['wr_skey'] = new_skey
 
-                save_cookies(cookies)
-
                 return new_skey
-            else:
-                continue
+
         except requests.RequestException as exc:
-            logging.warning(f"refresh_cookie 请求失败，payload={cookie_data}，原因：{exc}")
-            continue
-        
-        
+            logging.warning(
+                "Cookie 刷新请求失败：%s", exc
+            )
+
     return None
 
 def fix_no_synckey():
