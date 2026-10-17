@@ -29,7 +29,7 @@ def get_curl_fingerprint():
     if not curl:
         raise RuntimeError("缺少 WXREAD_CURL_BASH")
 
-    return hashlib.sha256(
+    return hashlib.sha256( 
         curl.encode("utf-8")
     ).hexdigest()
 
